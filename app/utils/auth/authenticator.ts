@@ -1,6 +1,6 @@
-import { Authenticator, Strategy } from "remix-auth";
-import { connectionSessionStorage } from "../sessions/connection.session.server";
-import { GoogleProvider } from "./google.server";
+import { Authenticator, Strategy } from 'remix-auth';
+import { connectionSessionStorage } from '../sessions/connection.session.server';
+import { GoogleProvider } from './google.server';
 
 const googleProvider = new GoogleProvider();
 
@@ -11,6 +11,7 @@ type ProviderUser = {
 };
 
 export interface AuthProvider {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getAuthStrategy(): Strategy<ProviderUser, any>;
   resolveConnectionData(providerId: string): Promise<{
     displayName: string;
@@ -19,6 +20,6 @@ export interface AuthProvider {
 }
 
 export const authenticator = new Authenticator<ProviderUser>(
-  connectionSessionStorage
+  connectionSessionStorage,
 );
-authenticator.use(googleProvider.getAuthStrategy(), "google");
+authenticator.use(googleProvider.getAuthStrategy(), 'google');

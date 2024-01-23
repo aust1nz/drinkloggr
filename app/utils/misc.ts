@@ -1,10 +1,10 @@
-import * as cookie from "cookie";
+import * as cookie from 'cookie';
 
 /**
  * Combine multiple header objects into one (uses append so headers are not overridden)
  */
 export function combineHeaders(
-  ...headers: Array<ResponseInit["headers"] | null | undefined>
+  ...headers: Array<ResponseInit['headers'] | null | undefined>
 ) {
   const combined = new Headers();
   for (const header of headers) {
@@ -34,10 +34,10 @@ export function combineResponseInits(
 
 export function getDomainUrl(request: Request) {
   const host =
-    request.headers.get("X-Forwarded-Host") ??
-    request.headers.get("host") ??
+    request.headers.get('X-Forwarded-Host') ??
+    request.headers.get('host') ??
     new URL(request.url).host;
-  const protocol = host.includes("localhost") ? "http" : "https";
+  const protocol = host.includes('localhost') ? 'http' : 'https';
   return `${protocol}://${host}`;
 }
 
@@ -45,39 +45,40 @@ export function getReferrerRoute(request: Request) {
   // spelling errors and whatever makes this annoyingly inconsistent
   // in my own testing, `referer` returned the right value, but 🤷‍♂️
   const referrer =
-    request.headers.get("referer") ??
-    request.headers.get("referrer") ??
+    request.headers.get('referer') ??
+    request.headers.get('referrer') ??
     request.referrer;
   const domain = getDomainUrl(request);
   if (referrer?.startsWith(domain)) {
     return referrer.slice(domain.length);
   } else {
-    return "/";
+    return '/';
   }
 }
 
 export function invariant(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   condition: any,
-  message: string | (() => string)
+  message: string | (() => string),
 ): asserts condition {
   if (!condition) {
-    throw new Error(typeof message === "function" ? message() : message);
+    throw new Error(typeof message === 'function' ? message() : message);
   }
 }
 
-const key = "redirectTo";
-export const destroyRedirectToHeader = cookie.serialize(key, "", {
+const key = 'redirectTo';
+export const destroyRedirectToHeader = cookie.serialize(key, '', {
   maxAge: -1,
 });
 
 export function getRedirectCookieHeader(redirectTo?: string) {
-  return redirectTo && redirectTo !== "/"
+  return redirectTo && redirectTo !== '/'
     ? cookie.serialize(key, redirectTo, { maxAge: 60 * 10 })
     : null;
 }
 
 export function getRedirectCookieValue(request: Request) {
-  const rawCookie = request.headers.get("cookie");
+  const rawCookie = request.headers.get('cookie');
   const parsedCookies = rawCookie ? cookie.parse(rawCookie) : {};
   const redirectTo = parsedCookies[key];
   return redirectTo || null;
@@ -103,12 +104,13 @@ export const getSessionExpirationDate = () =>
  * @throws {Response} if condition is falsey
  */
 export function invariantResponse(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   condition: any,
   message: string | (() => string),
-  responseInit?: ResponseInit
+  responseInit?: ResponseInit,
 ): asserts condition {
   if (!condition) {
-    throw new Response(typeof message === "function" ? message() : message, {
+    throw new Response(typeof message === 'function' ? message() : message, {
       status: 400,
       ...responseInit,
     });

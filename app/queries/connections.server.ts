@@ -1,11 +1,11 @@
-import { sql } from "~/db/db.server";
+import { sql } from '~/db/db.server';
 
 type ExistingConnection = {
   userId: number;
 };
 export const findExistingConnection = async (
   providerName: string,
-  providerId: string
+  providerId: string,
 ): Promise<ExistingConnection | undefined> => {
   const [existingConnection]: ExistingConnection[] =
     await sql`select "userId" from connections where "providerName" = ${providerName} and "providerId" = ${providerId}`;

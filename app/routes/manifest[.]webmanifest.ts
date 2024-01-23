@@ -3,12 +3,12 @@ import { json } from '@remix-run/node';
 export const loader = async () => {
   return json(
     {
-      short_name: 'PWA',
-      name: 'Remix PWA',
+      short_name: 'Drinkloggr',
+      name: 'Drinkloggr',
       start_url: '/',
       display: 'standalone',
       background_color: '#d3d7dd',
-      theme_color: '#c34138',
+      theme_color: '#1f2937',
       shortcuts: [
         {
           name: 'Homepage',
@@ -49,7 +49,7 @@ export const loader = async () => {
           density: '2.0',
         },
         {
-          src: '/icons/android-icon-144x144.png',
+          src: '/icons/android-icon-144_144.png',
           sizes: '144x144',
           type: 'image/png',
           density: '3.0',
@@ -71,6 +71,6 @@ export const loader = async () => {
         'Cache-Control': 'public, max-age=600',
         'Content-Type': 'application/manifest+json',
       },
-    }
+    },
   );
 };

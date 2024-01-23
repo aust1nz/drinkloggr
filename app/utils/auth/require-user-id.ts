@@ -1,9 +1,9 @@
-import { redirect } from "@remix-run/node";
-import { getUserId } from "./get-user-id";
+import { redirect } from '@remix-run/node';
+import { getUserId } from './get-user-id';
 
 export async function requireUserId(
   request: Request,
-  { redirectTo }: { redirectTo?: string | null } = {}
+  { redirectTo }: { redirectTo?: string | null } = {},
 ) {
   const userId = await getUserId(request);
   if (!userId) {
@@ -13,9 +13,9 @@ export async function requireUserId(
         ? null
         : redirectTo ?? `${requestUrl.pathname}${requestUrl.search}`;
     const loginParams = redirectTo ? new URLSearchParams({ redirectTo }) : null;
-    const loginRedirect = ["/login", loginParams?.toString()]
+    const loginRedirect = ['/login', loginParams?.toString()]
       .filter(Boolean)
-      .join("?");
+      .join('?');
     throw redirect(loginRedirect);
   }
   return userId;

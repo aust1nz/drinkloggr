@@ -1,9 +1,9 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 const schema = z.object({
-  NODE_ENV: z.enum(["production", "development", "test"] as const),
+  NODE_ENV: z.enum(['production', 'development', 'test'] as const),
   DATABASE_URL: z.string(),
-  DROP_SCHEMA_ON_MIGRATIONS: z.enum(["true", "false"] as const),
+  DROP_SCHEMA_ON_MIGRATIONS: z.enum(['true', 'false'] as const),
   SESSION_SECRET: z.string(),
   RESEND_API_KEY: z.string(),
   GOOGLE_CLIENT_ID: z.string(),
@@ -22,11 +22,11 @@ export function init() {
 
   if (parsed.success === false) {
     console.error(
-      "❌ Invalid environment variables:",
-      parsed.error.flatten().fieldErrors
+      '❌ Invalid environment variables:',
+      parsed.error.flatten().fieldErrors,
     );
 
-    throw new Error("Invalid environment variables");
+    throw new Error('Invalid environment variables');
   }
 }
 

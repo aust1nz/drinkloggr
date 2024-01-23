@@ -42,7 +42,10 @@ const assetsHandler = cacheFirst({
 
 // The default fetch event handler will be invoke if the
 // route is not matched by any of the worker action/loader.
-export const defaultFetchHandler: DefaultFetchHandler = ({ context, request }) => {
+export const defaultFetchHandler: DefaultFetchHandler = ({
+  context,
+  request,
+}) => {
   const type = matchRequest(request);
 
   if (type === 'asset') {
@@ -61,6 +64,6 @@ const handler = new RemixNavigationHandler({
   documentCache,
 });
 
-self.addEventListener('message', event => {
+self.addEventListener('message', (event) => {
   event.waitUntil(handler.handle(event));
 });

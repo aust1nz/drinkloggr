@@ -1,15 +1,15 @@
-import * as dotenv from "dotenv";
-import fs from "fs";
-import path, { dirname } from "path";
-import postgres from "postgres";
-import { fileURLToPath } from "url";
+import * as dotenv from 'dotenv';
+import fs from 'fs';
+import path, { dirname } from 'path';
+import postgres from 'postgres';
+import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const MIGRATION_DIRECTORY = "../app/db/migrations" as const;
-const SEEDS_DIRECTORY = "../app/db/seeds" as const;
+const MIGRATION_DIRECTORY = '../app/db/migrations' as const;
+const SEEDS_DIRECTORY = '../app/db/seeds' as const;
 dotenv.config();
 
-const sql = postgres(process.env.DATABASE_URL || "", {
+const sql = postgres(process.env.DATABASE_URL || '', {
   idle_timeout: 1,
   onnotice: () => false,
 });
@@ -17,8 +17,8 @@ const sql = postgres(process.env.DATABASE_URL || "", {
 // Drop the schema if the environment variable is set.
 // Useful for iterating in dev mode.
 if (
-  process.env.NODE_ENV === "development" &&
-  process.env.DROP_SCHEMA_ON_MIGRATIONS === "true"
+  process.env.NODE_ENV === 'development' &&
+  process.env.DROP_SCHEMA_ON_MIGRATIONS === 'true'
 ) {
   await sql`DROP SCHEMA public CASCADE;`;
   await sql`CREATE SCHEMA public`;
@@ -33,7 +33,7 @@ await sql`
       name text primary key,
       created_at timestamp with time zone not null default now()
     )
-  `
+  `,
 );
 
 // Find migrations that are already recorded in the database.
@@ -54,7 +54,7 @@ const newMigrations = fs
   .filter(
     (migrationName) =>
       migrationName.match(/^[0-9]{4}\.[0-9]{2}\.[0-9]{2}\..*\.sql$/) &&
-      !completedMigrations.includes(migrationName)
+      !completedMigrations.includes(migrationName),
   );
 
 for (const migration of newMigrations) {
@@ -64,7 +64,7 @@ for (const migration of newMigrations) {
   });
 }
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === 'development') {
   const seeds = fs
     .readdirSync(path.join(__dirname, SEEDS_DIRECTORY))
     .filter((seedName) => seedName.match(/\.sql$/));

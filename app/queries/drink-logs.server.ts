@@ -1,4 +1,4 @@
-import { sql } from "../db/db.server";
+import { sql } from '../db/db.server';
 
 type Log = {
   id: number;
@@ -7,7 +7,7 @@ type Log = {
 };
 export const findDrinkLogByUserAndDate = async (
   userId: number,
-  date: Date
+  date: Date,
 ): Promise<Log | null> => {
   const [logs] = await sql<
     Log[]
@@ -18,7 +18,7 @@ export const findDrinkLogByUserAndDate = async (
 export const setDrinks = async (
   userId: number,
   date: Date,
-  drinks: number
+  drinks: number,
 ): Promise<void> => {
   await sql`insert into "drinkLogs" ("userId", date, drinks, "updatedAt") values (${userId}, ${date}, ${drinks}, now()) on conflict ("userId", date) do update set drinks = ${drinks}, "updatedAt" = now()`;
 };
@@ -29,7 +29,7 @@ export const logDrink = async (userId: number, date: Date): Promise<void> => {
 
 export const removeDrink = async (
   userId: number,
-  date: Date
+  date: Date,
 ): Promise<void> => {
   await sql`update "drinkLogs" set drinks = GREATEST(drinks - 1, 0), "updatedAt" = now() where "userId" = ${userId} and date = ${date}`;
 };

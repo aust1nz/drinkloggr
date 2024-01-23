@@ -1,23 +1,17 @@
-import { LoaderFunctionArgs, redirect } from "@remix-run/node";
-// import { createProviderConnection } from "~/db/queries/connections.server";
-import { createDbSession } from "~/queries/sessions.server";
-import { createConnectedUser, findUserByEmail } from "~/queries/users.server";
-import { authenticator } from "~/utils/auth/authenticator";
-import { getUserId } from "~/utils/auth/get-user-id";
-import {
-  combineHeaders,
-  destroyRedirectToHeader,
-  getRedirectCookieValue,
-} from "~/utils/misc";
-// import { createToastHeaders, redirectWithToast } from "~/utils/toast.server";
+import { LoaderFunctionArgs, redirect } from '@remix-run/node';
 import {
   createProviderConnection,
   findExistingConnection,
-} from "~/queries/connections.server";
-import { authSessionStorage } from "~/utils/sessions/auth.session.server";
-import { handleNewSession } from "~/utils/sessions/handle-new-session";
+} from '~/queries/connections.server';
+import { createDbSession } from '~/queries/sessions.server';
+import { createConnectedUser, findUserByEmail } from '~/queries/users.server';
+import { authenticator } from '~/utils/auth/authenticator';
+import { getUserId } from '~/utils/auth/get-user-id';
+import { combineHeaders, destroyRedirectToHeader } from '~/utils/misc';
+import { authSessionStorage } from '~/utils/sessions/auth.session.server';
+import { handleNewSession } from '~/utils/sessions/handle-new-session';
 
-const destroyRedirectTo = { "set-cookie": destroyRedirectToHeader };
+const destroyRedirectTo = { 'set-cookie': destroyRedirectToHeader };
 
 async function makeSession(
   {
@@ -25,63 +19,62 @@ async function makeSession(
     userId,
     redirectTo,
   }: { request: Request; userId: number; redirectTo?: string | null },
-  responseInit?: ResponseInit
+  responseInit?: ResponseInit,
 ) {
-  redirectTo ??= "/";
+  redirectTo ??= '/';
   const session = await createDbSession(userId);
   return handleNewSession(
     { request, session, redirectTo },
-    { headers: combineHeaders(responseInit?.headers, destroyRedirectTo) }
+    { headers: combineHeaders(responseInit?.headers, destroyRedirectTo) },
   );
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const providerName = "google";
-  const redirectTo = getRedirectCookieValue(request);
+export async function loader({ request }: LoaderFunctionArgs) {
+  const providerName = 'google';
 
   const authResult = await authenticator
     .authenticate(providerName, request, { throwOnError: true })
     .then(
       (data) => ({ success: true, data }) as const,
-      (error) => ({ success: false, error }) as const
+      (error) => ({ success: false, error }) as const,
     );
 
   if (!authResult.success) {
     console.error(authResult.error);
     throw await redirect(
-      "/",
+      '/',
       // {
       //   title: "Auth Failed",
       //   description: `There was an error authenticating with Google.`,
       //   type: "error",
       // },
-      { headers: destroyRedirectTo }
+      { headers: destroyRedirectTo },
     );
   }
 
   const { data: profile } = authResult;
-  const existingConnection = await findExistingConnection("google", profile.id);
+  const existingConnection = await findExistingConnection('google', profile.id);
 
   const userId = await getUserId(request);
 
   if (existingConnection && userId) {
     if (existingConnection.userId === userId) {
       return redirect(
-        "/",
+        '/',
         // {
         //   title: "Already Connected",
         //   description: `Your "${profile.email}" Google account is already connected.`,
         // },
-        { headers: destroyRedirectTo }
+        { headers: destroyRedirectTo },
       );
     } else {
       return redirect(
-        "/",
+        '/',
         // {
         //   title: "Already Connected",
         //   description: `The "${profile.email}" Google account is already connected to another account.`,
         // },
-        { headers: destroyRedirectTo }
+        { headers: destroyRedirectTo },
       );
     }
   }
@@ -94,13 +87,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       userId,
     });
     return redirect(
-      "/",
+      '/',
       // {
       //   title: "Connected",
       //   type: "success",
       //   description: `Your "${profile.email}" Google account has been connected.`,
       // },
-      { headers: destroyRedirectTo }
+      { headers: destroyRedirectTo },
     );
   }
 
@@ -125,7 +118,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         //   title: "Connected",
         //   description: `Your "${profile.email}" Google account has been connected.`,
         // }),
-      }
+      },
     );
   }
 
@@ -137,16 +130,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 
   const authSession = await authSessionStorage.getSession(
-    request.headers.get("cookie")
+    request.headers.get('cookie'),
   );
-  authSession.set("sessionId", session.id);
+  authSession.set('sessionId', session.id);
   const headers = new Headers();
   headers.append(
-    "set-cookie",
+    'set-cookie',
     await authSessionStorage.commitSession(authSession, {
       expires: session.expirationDate,
-    })
+    }),
   );
 
-  return redirect("/");
+  return redirect('/');
 }

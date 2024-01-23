@@ -1,7 +1,7 @@
-import { invariant } from "~/utils/misc";
-import { sql } from "../db/db.server";
-import { createProviderConnection } from "./connections.server";
-import { createDbSession } from "./sessions.server";
+import { invariant } from '~/utils/misc';
+import { sql } from '../db/db.server';
+import { createProviderConnection } from './connections.server';
+import { createDbSession } from './sessions.server';
 
 type User = {
   id: number;
@@ -11,7 +11,7 @@ type User = {
 export const findUser = async (id: number) => {
   const [user]: User[] =
     await sql`select id, email, name from users where id = ${id}`;
-  invariant(user, "User unexpectedly not found");
+  invariant(user, 'User unexpectedly not found');
   return user;
 };
 
@@ -19,7 +19,7 @@ type FoundUser = {
   id: number;
 };
 export const findUserByEmail = async (
-  email: string
+  email: string,
 ): Promise<FoundUser | undefined> => {
   const [user]: FoundUser[] =
     await sql`select id from users where email = ${email.toLowerCase()}`;
@@ -34,7 +34,7 @@ type CreatedUser = {
 };
 export const createUser = async (userInput: NewUserSchema) => {
   const [user]: CreatedUser[] = await sql`insert into users ${sql(
-    userInput
+    userInput,
   )} returning id`;
   return user;
 };

@@ -1,7 +1,7 @@
-import { redirect } from "@remix-run/node";
-import { safeRedirect } from "remix-utils/safe-redirect";
-import { combineResponseInits } from "~/utils/misc";
-import { authSessionStorage } from "~/utils/sessions/auth.session.server";
+import { redirect } from '@remix-run/node';
+import { safeRedirect } from 'remix-utils/safe-redirect';
+import { combineResponseInits } from '~/utils/misc';
+import { authSessionStorage } from '~/utils/sessions/auth.session.server';
 
 export async function handleNewSession(
   {
@@ -13,7 +13,7 @@ export async function handleNewSession(
     session: { userId: number; id: number; expirationDate: Date };
     redirectTo?: string;
   },
-  responseInit?: ResponseInit
+  responseInit?: ResponseInit,
 ) {
   // const hasTwoFactor = await userHasTwoFactor(session.userId);
 
@@ -40,22 +40,22 @@ export async function handleNewSession(
   //   );
   // } else {
   const authSession = await authSessionStorage.getSession(
-    request.headers.get("cookie")
+    request.headers.get('cookie'),
   );
-  authSession.set("sessionId", session.id);
+  authSession.set('sessionId', session.id);
 
   return redirect(
-    safeRedirect(redirectTo ?? "/app"),
+    safeRedirect(redirectTo ?? '/app'),
     combineResponseInits(
       {
         headers: {
-          "set-cookie": await authSessionStorage.commitSession(authSession, {
+          'set-cookie': await authSessionStorage.commitSession(authSession, {
             expires: session.expirationDate,
           }),
         },
       },
-      responseInit
-    )
+      responseInit,
+    ),
   );
   // }
 }
