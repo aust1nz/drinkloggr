@@ -1,4 +1,4 @@
-import { LiveReload } from '@remix-pwa/sw';
+import { LiveReload, useSWEffect } from '@remix-pwa/sw';
 import { LinksFunction, LoaderFunctionArgs, json } from '@remix-run/node';
 import {
   Link,
@@ -29,7 +29,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export default function App() {
-  // useSWEffect();
+  useSWEffect();
   const location = useLocation();
   const { userId } = useLoaderData<typeof loader>();
 
