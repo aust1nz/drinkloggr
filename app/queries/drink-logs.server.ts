@@ -15,6 +15,15 @@ export const findDrinkLogByUserAndDate = async (
   return logs;
 };
 
+export const findDrinkLogsByUserAndDateRange = async (
+  userId: number,
+): Promise<Log[]> => {
+  const logs = await sql<
+    Log[]
+  >`select id, date, drinks from "drinkLogs" where "userId" = ${userId} and EXTRACT(MONTH FROM date) = EXTRACT(MONTH FROM now()) and EXTRACT(YEAR from date) = EXTRACT(YEAR from now())`;
+  return logs;
+};
+
 export const setDrinks = async (
   userId: number,
   date: Date,

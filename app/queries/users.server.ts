@@ -1,7 +1,5 @@
 import { invariant } from '~/utils/misc';
 import { sql } from '../db/db.server';
-import { createProviderConnection } from './connections.server';
-import { createDbSession } from './sessions.server';
 
 type User = {
   id: number;
@@ -12,6 +10,12 @@ export const findUser = async (id: number) => {
   const [user]: User[] =
     await sql`select id, email, name from users where id = ${id}`;
   invariant(user, 'User unexpectedly not found');
+  return user;
+};
+
+export const findUserBySub = async (sub: string): Promise<User | undefined> => {
+  const [user]: User[] =
+    await sql`select id, email, name from users where "googleSub" = ${sub}`;
   return user;
 };
 
@@ -28,6 +32,8 @@ export const findUserByEmail = async (
 
 type NewUserSchema = {
   email: string;
+  name?: string;
+  googleSub: string;
 };
 type CreatedUser = {
   id: number;
@@ -37,28 +43,4 @@ export const createUser = async (userInput: NewUserSchema) => {
     userInput,
   )} returning id`;
   return user;
-};
-
-export type ConnectedUserInput = {
-  email: string;
-  providerId: string;
-  providerName: string;
-};
-export const createConnectedUser = async ({
-  email,
-  providerId,
-  providerName,
-}: ConnectedUserInput) => {
-  return await sql.begin(async () => {
-    const user = await createUser({
-      email: email.toLowerCase(),
-    });
-    await createProviderConnection({
-      userId: user.id,
-      providerId,
-      providerName,
-    });
-    const session = await createDbSession(user.id);
-    return session;
-  });
 };

@@ -27,3 +27,7 @@ export const findActiveDbSession = async (
     await sql`select "userId" from sessions where id = ${id} and "expirationDate" > now()`;
   return session;
 };
+
+export const deleteDbSession = async (id: number): Promise<void> => {
+  await sql`delete from sessions where id = ${id}`;
+};

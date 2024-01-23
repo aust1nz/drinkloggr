@@ -1,14 +1,8 @@
 import { LoaderFunctionArgs, redirect } from '@remix-run/node';
-import {
-  createProviderConnection,
-  findExistingConnection,
-} from '~/queries/connections.server';
 import { createDbSession } from '~/queries/sessions.server';
-import { createConnectedUser, findUserByEmail } from '~/queries/users.server';
+import { createUser, findUserBySub } from '~/queries/users.server';
 import { authenticator } from '~/utils/auth/authenticator';
-import { getUserId } from '~/utils/auth/get-user-id';
 import { combineHeaders, destroyRedirectToHeader } from '~/utils/misc';
-import { authSessionStorage } from '~/utils/sessions/auth.session.server';
 import { handleNewSession } from '~/utils/sessions/handle-new-session';
 
 const destroyRedirectTo = { 'set-cookie': destroyRedirectToHeader };
@@ -41,105 +35,23 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   if (!authResult.success) {
     console.error(authResult.error);
-    throw await redirect(
-      '/',
-      // {
-      //   title: "Auth Failed",
-      //   description: `There was an error authenticating with Google.`,
-      //   type: "error",
-      // },
-      { headers: destroyRedirectTo },
-    );
+    throw redirect('/', { headers: destroyRedirectTo });
   }
 
   const { data: profile } = authResult;
-  const existingConnection = await findExistingConnection('google', profile.id);
-
-  const userId = await getUserId(request);
-
-  if (existingConnection && userId) {
-    if (existingConnection.userId === userId) {
-      return redirect(
-        '/',
-        // {
-        //   title: "Already Connected",
-        //   description: `Your "${profile.email}" Google account is already connected.`,
-        // },
-        { headers: destroyRedirectTo },
-      );
-    } else {
-      return redirect(
-        '/',
-        // {
-        //   title: "Already Connected",
-        //   description: `The "${profile.email}" Google account is already connected to another account.`,
-        // },
-        { headers: destroyRedirectTo },
-      );
-    }
-  }
-
-  // If we're already logged in, then link the account
-  if (userId) {
-    await createProviderConnection({
-      providerName,
-      providerId: profile.id,
-      userId,
-    });
-    return redirect(
-      '/',
-      // {
-      //   title: "Connected",
-      //   type: "success",
-      //   description: `Your "${profile.email}" Google account has been connected.`,
-      // },
-      { headers: destroyRedirectTo },
-    );
-  }
+  const existingUser = await findUserBySub(profile.id);
 
   // Connection exists already? Make a new session
-  if (existingConnection) {
-    return makeSession({ request, userId: existingConnection.userId });
-  }
-
-  // if the email matches a user in the db, then link the account and
-  // make a new session
-  const user = await findUserByEmail(profile.email);
-  if (user) {
-    await createProviderConnection({
-      providerName,
-      providerId: profile.id,
-      userId: user.id,
-    });
-    return makeSession(
-      { request, userId: user.id },
-      {
-        // headers: await createToastHeaders({
-        //   title: "Connected",
-        //   description: `Your "${profile.email}" Google account has been connected.`,
-        // }),
-      },
-    );
+  if (existingUser) {
+    return makeSession({ request, userId: existingUser.id });
   }
 
   // this is a new user, so let's get them onboarded
-  const session = await createConnectedUser({
+  const newUser = await createUser({
     email: profile.email.toLowerCase(),
-    providerId: profile.id,
-    providerName,
+    name: profile.name,
+    googleSub: profile.id,
   });
 
-  const authSession = await authSessionStorage.getSession(
-    request.headers.get('cookie'),
-  );
-  authSession.set('sessionId', session.id);
-  const headers = new Headers();
-  headers.append(
-    'set-cookie',
-    await authSessionStorage.commitSession(authSession, {
-      expires: session.expirationDate,
-    }),
-  );
-
-  return redirect('/');
+  return makeSession({ request, userId: newUser.id });
 }

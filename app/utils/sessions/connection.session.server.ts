@@ -13,6 +13,6 @@ export const connectionSessionStorage = createCookieSessionStorage({
   },
 });
 
-export function resolveConnectionData(providerId: string) {
-  return new GoogleProvider().resolveConnectionData(providerId);
+export function resolveConnectionData() {
+  return new GoogleProvider().resolveConnectionData();
 }

@@ -3,7 +3,7 @@ import { GoogleIcon } from '~/icons';
 
 export default function SignIn() {
   return (
-    <div>
+    <div className="mb-48">
       <Form
         className="flex items-center justify-center gap-2"
         action={'/auth/google'}
