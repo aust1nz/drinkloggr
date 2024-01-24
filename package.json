@@ -19,6 +19,7 @@
   "dependencies": {
     "@conform-to/react": "^0.9.1",
     "@conform-to/zod": "^0.9.1",
+    "@epic-web/client-hints": "^1.2.2",
     "@remix-pwa/cache": "^2.0.12",
     "@remix-pwa/strategy": "^2.1.9",
     "@remix-pwa/sw": "^2.1.12",
@@ -27,7 +28,8 @@
     "@remix-run/react": "^2.5.0",
     "@remix-run/serve": "^2.5.0",
     "clsx": "^2.1.0",
-    "date-fns": "^3.3.1",
+    "date-fns": "^2.30.0",
+    "date-fns-tz": "^2.0.0",
     "dotenv": "^16.3.1",
     "isbot": "^3.6.8",
     "postgres": "^3.4.3",

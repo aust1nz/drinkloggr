@@ -4,6 +4,7 @@ import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
 import { Form, json, useLoaderData } from '@remix-run/react';
 import clsx from 'clsx';
 import { addDays, subDays } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import { z } from 'zod';
 import SignIn from '~/components/sign-in';
 import {
@@ -15,6 +16,7 @@ import {
 import { findUser } from '~/queries/users.server';
 import { getUserId } from '~/utils/auth/get-user-id';
 import { requireUserId } from '~/utils/auth/require-user-id';
+import { getHints } from '~/utils/get-hints';
 
 export const meta: MetaFunction = () => {
   return [
@@ -35,11 +37,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { searchParams } = new URL(request.url);
   const queryDate = searchParams.get('date'); // null or YYYY-MM-DD
-  const [month, day, year] = new Date().toLocaleDateString().split('/');
+  const { timeZone } = getHints(request);
 
   const date = queryDate
     ? new Date(queryDate)
-    : new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`);
+    : new Date(formatInTimeZone(new Date(), timeZone, 'yyyy-MM-dd'));
 
   const logs = await findDrinkLogByUserAndDate(userId, date);
 

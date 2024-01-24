@@ -13,6 +13,8 @@ import {
 import { CalendarIcon, HomeIcon, SettingsIcon, TrendsIcon } from './icons';
 import styles from './styles/tailwind.css';
 import { getUserId } from './utils/auth/get-user-id';
+import { ClientHintCheck, getHints } from './utils/get-hints';
+import { useNonce } from './utils/nonce-provider';
 
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }];
 
@@ -25,13 +27,19 @@ const navs = [
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await getUserId(request);
-  return json({ userId });
+  return json({
+    requestInfo: {
+      hints: getHints(request),
+    },
+    userId,
+  });
 };
 
 export default function App() {
   useSWEffect();
   const location = useLocation();
   const { userId } = useLoaderData<typeof loader>();
+  const nonce = useNonce();
 
   return (
     <html lang="en">
@@ -39,6 +47,7 @@ export default function App() {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="manifest" href="manifest.webmanifest" />
+        <ClientHintCheck nonce={nonce} />
         <Meta />
         <Links />
       </head>
