@@ -1,44 +1,59 @@
 import { sql } from '../db/db.server';
 
-type Log = {
+type DrinkLog = {
   id: number;
   date: string;
   drinks: number;
 };
-export const findDrinkLogByUserAndDate = async (
-  userId: number,
-  date: Date,
-): Promise<Log | null> => {
-  const [logs] = await sql<
-    Log[]
-  >`select id, date, drinks from "drinkLogs" where "userId" = ${userId} and date = ${date}`;
-  return logs;
-};
 
-export const findDrinkLogsByUserAndDateRange = async (
-  userId: number,
-): Promise<Log[]> => {
-  const logs = await sql<
-    Log[]
-  >`select id, date, drinks from "drinkLogs" where "userId" = ${userId} and EXTRACT(MONTH FROM date) = EXTRACT(MONTH FROM now()) and EXTRACT(YEAR from date) = EXTRACT(YEAR from now())`;
-  return logs;
-};
+export async function findDrinkLogByUserAndDate(userId: number, date: Date) {
+  const [log]: [DrinkLog?] = await sql`
+    SELECT id, date, drinks
+    FROM "drinkLogs"
+    WHERE "userId" = ${userId}
+      AND date = ${date}`;
+  return log;
+}
 
-export const setDrinks = async (
-  userId: number,
-  date: Date,
-  drinks: number,
-): Promise<void> => {
-  await sql`insert into "drinkLogs" ("userId", date, drinks, "updatedAt") values (${userId}, ${date}, ${drinks}, now()) on conflict ("userId", date) do update set drinks = ${drinks}, "updatedAt" = now()`;
-};
+export async function findDrinkLogsByUserAndDateRange(userId: number) {
+  return await sql<DrinkLog[]>`
+    SELECT id, date, drinks
+    FROM "drinkLogs"
+    WHERE "userId" = ${userId}
+      AND EXTRACT(MONTH FROM date) = EXTRACT(MONTH FROM NOW())
+      AND EXTRACT(YEAR from date) = EXTRACT(YEAR from NOW())`;
+}
 
-export const logDrink = async (userId: number, date: Date): Promise<void> => {
-  await sql`insert into "drinkLogs" ("userId", date, drinks, "updatedAt") values (${userId}, ${date}, 1, now()) on conflict ("userId", date) do update set drinks = "drinkLogs".drinks + 1, "updatedAt" = now()`;
-};
+export async function setDrinks(userId: number, date: Date, drinks: number) {
+  const drinkLog = {
+    userId,
+    date,
+    drinks,
+    updatedAt: new Date(),
+  };
+  await sql`
+    INSERT INTO "drinkLogs" ${sql(drinkLog)}
+    ON CONFLICT ("userId", date)
+    DO UPDATE SET drinks = ${drinks}, "updatedAt" = NOW()`;
+}
 
-export const removeDrink = async (
-  userId: number,
-  date: Date,
-): Promise<void> => {
-  await sql`update "drinkLogs" set drinks = GREATEST(drinks - 1, 0), "updatedAt" = now() where "userId" = ${userId} and date = ${date}`;
-};
+export async function logDrink(userId: number, date: Date) {
+  const drinkLog = {
+    userId,
+    date,
+    drinks: 1,
+    updatedAt: new Date(),
+  };
+  await sql`
+    INSERT INTO "drinkLogs" ${sql(drinkLog)}
+    ON CONFLICT ("userId", date)
+    DO UPDATE SET drinks = "drinkLogs".drinks + 1, "updatedAt" = NOW()`;
+}
+
+export async function removeDrink(userId: number, date: Date) {
+  await sql`
+    UPDATE "drinkLogs"
+    SET drinks = GREATEST(drinks - 1, 0), "updatedAt" = NOW()
+    WHERE "userId" = ${userId}
+    AND date = ${date};`;
+}

@@ -7908,17 +7908,18 @@ var route7 = __toESM(require_trends());
 
 // assets-module:@remix-pwa/dev?assets
 var assets = [
-  '/build/root-XHS3SDRE.js',
-  '/build/manifest-5630A2AF.js',
+  '/build/root-Y2FWFQO2.js',
+  '/build/manifest-34C3B1AB.js',
   '/build/entry.client-VS6RBTG2.js',
   '/build/__remix_entry_dev-5IUQUR5Q.js',
+  '/build/_assets/tailwind-NQHDEAZR.css',
   '/build/routes/trends-RUERSTBS.js',
   '/build/routes/settings-L6JZ3XWT.js',
   '/build/routes/manifest[.]webmanifest-J3KYYY3Q.js',
-  '/build/routes/calendar-IRMQR4LR.js',
+  '/build/routes/calendar-CLHWEWFH.js',
   '/build/routes/auth.google.callback-RT4XPXLD.js',
   '/build/routes/auth.google-VGCC6HJ5.js',
-  '/build/routes/_index-Y4SAPEBG.js',
+  '/build/routes/_index-ZK2VYKBI.js',
   '/build/_shared/runtime-GC7QIU56.js',
   '/build/_shared/remix_hmr-DV2GEN3X.js',
   '/build/_shared/react-dom-BEFB7ICU.js',
@@ -7931,7 +7932,6 @@ var assets = [
   '/build/_shared/chunk-YWVR2EZU.js',
   '/build/_shared/chunk-XU7DNSPJ.js',
   '/build/_shared/chunk-UWV35TSL.js',
-  '/build/_shared/chunk-SMURADD2.js',
   '/build/_shared/chunk-PNG5AS42.js',
   '/build/_shared/chunk-IPAXUMR4.js',
   '/build/_shared/chunk-I226OURE.js',
@@ -7939,7 +7939,7 @@ var assets = [
   '/build/_shared/chunk-G7CHZRZX.js',
   '/build/_shared/chunk-BOXFZXVX.js',
   '/build/_shared/chunk-A5H6TIFJ.js',
-  '/build/_assets/tailwind-NQHDEAZR.css',
+  '/build/_shared/chunk-5JTJHCDS.js',
 ];
 
 // entry-module:@remix-pwa/build/magic

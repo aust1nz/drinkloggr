@@ -6,28 +6,36 @@ type NewSessionResult = {
   expirationDate: Date;
   userId: number;
 };
-export const createDbSession = async (
-  userId: number,
-): Promise<NewSessionResult> => {
-  const [session]: NewSessionResult[] = await sql`insert into sessions ${sql({
+type SessionResult = { userId: number };
+
+export async function createDbSession(userId: number) {
+  const newSession = {
     expirationDate: getSessionExpirationDate(),
     userId,
-  })} returning id, "expirationDate", "userId"`;
+  };
+  const [session]: [NewSessionResult?] = await sql`
+    INSERT INTO sessions ${sql(newSession)}
+    RETURNING id, "expirationDate", "userId"`;
   if (!session) {
     throw new Error('Failed to insert session');
   }
   return session;
-};
+}
 
-type SessionResult = { userId: number };
-export const findActiveDbSession = async (
-  id: number,
-): Promise<SessionResult | undefined> => {
-  const [session]: SessionResult[] =
-    await sql`select "userId" from sessions where id = ${id} and "expirationDate" > now()`;
+export async function findActiveDbSession(id: number) {
+  const [session]: [SessionResult?] = await sql`
+      SELECT "userId"
+      FROM sessions
+      WHERE id = ${id}
+      AND "expirationDate" > now()`;
+  if (!session) {
+    return null;
+  }
   return session;
-};
+}
 
-export const deleteDbSession = async (id: number): Promise<void> => {
-  await sql`delete from sessions where id = ${id}`;
-};
+export async function deleteDbSession(id: number) {
+  await sql`
+    DELETE FROM sessions
+    WHERE id = ${id}`;
+}

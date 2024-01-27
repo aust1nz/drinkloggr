@@ -13,8 +13,9 @@ import {
 import { CalendarIcon, HomeIcon, SettingsIcon, TrendsIcon } from './icons';
 import styles from './styles/tailwind.css';
 import { getUserId } from './utils/auth/get-user-id';
-import { ClientHintCheck, getHints } from './utils/get-hints';
+import { ClientHintCheck, getHints, useHints } from './utils/get-hints';
 import { useNonce } from './utils/nonce-provider';
+import { useRequestInfo } from './utils/request-info';
 
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }];
 
@@ -34,6 +35,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     userId,
   });
 };
+
+/**
+ * @returns the user's theme preference, or the client hint theme if the user
+ * has not set a preference.
+ */
+export function useTimezone() {
+  const hints = useHints();
+  const requestInfo = useRequestInfo();
+  return requestInfo.hints.timeZone ?? hints.timeZone;
+}
 
 export default function App() {
   useSWEffect();

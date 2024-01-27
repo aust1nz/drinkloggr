@@ -16,7 +16,6 @@ const hintsUtils = getHintUtils({
 export const { getHints } = hintsUtils;
 
 export function useHints() {
-  console.log('hello');
   const requestInfo = useRequestInfo();
   return requestInfo.hints;
 }

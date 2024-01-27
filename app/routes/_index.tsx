@@ -14,6 +14,7 @@ import {
   setDrinks,
 } from '~/queries/drink-logs.server';
 import { findUser } from '~/queries/users.server';
+import { useTimezone } from '~/root';
 import { getUserId } from '~/utils/auth/get-user-id';
 import { requireUserId } from '~/utils/auth/require-user-id';
 import { getHints } from '~/utils/get-hints';
@@ -95,11 +96,11 @@ const getWeekday = (isoDate: string) => {
 };
 
 export default function Index() {
+  const timeZone = useTimezone();
   const { user, logs } = useLoaderData<typeof loader>();
   const [form] = useForm({});
-  const [month, day, year] = new Date().toLocaleDateString().split('/');
   const today = new Date(
-    `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`,
+    new Date(formatInTimeZone(new Date(), timeZone, 'yyyy-MM-dd')),
   );
 
   if (!user)
@@ -143,7 +144,9 @@ export default function Index() {
               id="date"
               name="date"
               value={
-                addDays(new Date(logs.date), 1).toISOString().split('T')[0]
+                new Date(logs.date) < subDays(today, 1)
+                  ? addDays(new Date(logs.date), 1).toISOString().split('T')[0]
+                  : ''
               }
             />
             <button
